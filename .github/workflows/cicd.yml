@@ -1,4 +1,4 @@
-name: dinghy
+name: cicd
 
 on:
   push:

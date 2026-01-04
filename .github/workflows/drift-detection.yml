@@ -1,0 +1,45 @@
+name: drift-detection
+on:
+  schedule:
+    - cron: '15 2 * * *'
+  workflow_dispatch:
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dinghydev/install-dinghy-cli@main
+      - run: dinghy check
+      - run: dinghy render
+  diff:
+    runs-on: ubuntu-latest
+    needs: verify
+    outputs:
+      pending_changes: ${{ steps.tf_diff.outputs.pending_changes }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_DEPLOY_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE }}
+      - uses: dinghydev/install-dinghy-cli@main
+        with:
+          prepare-images: release,tf
+      - run: dinghy tf diff
+        id: tf_diff
+      - uses: actions/upload-artifact@v6
+        if: steps.tf_diff.outputs.pending_changes == 'true'
+        with:
+          name: pending-changes-${{ github.run_id }}
+          path: output/
+      - name: Detected drift
+        if: steps.tf_diff.outputs.pending_changes == 'true'
+        run: |
+          echo "Drift detected"
+          exit 1
