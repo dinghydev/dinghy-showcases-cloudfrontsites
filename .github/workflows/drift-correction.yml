@@ -1,0 +1,34 @@
+name: Drift Correction
+on:
+  issues:
+    types: [labeled]
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read # This is required for actions/checkout
+  actions: read # This is required for actions/download-artifact
+  issues: write # This is required for gh issue operations
+
+jobs:
+  deploy:
+    if: ${{ github.event.label.name == 'approved-deployment' }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-region: ${{ secrets.AWS_DEPLOY_REGION }}
+          role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE }}
+      - uses: dinghydev/setup-dinghy@main
+        with:
+          prepare-images: release,tf
+      - name: Download Dinghy Output
+        uses: actions/download-artifact@v6
+        with:
+          name: dinghy-output
+          path: output/
+          run-id: ${{ env.GITHUB_ISSUE_RUN_ID }}
+          github-token: ${{ github.token }}
+      - run: dinghy tf deploy
+        env:
+          GH_TOKEN: ${{ github.token }}

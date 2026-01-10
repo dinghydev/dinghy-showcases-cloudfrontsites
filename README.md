@@ -4,6 +4,10 @@ This is a complete, end-to-end Infrastructure as Code (IaC) example project
 using Dinghy, showcasing the
 [CloudFront Sites Demo](https://dinghy.dev/examples/tf-aws/composites/cloudfront-sites/demo).
 
+## Generate Deployment Diagram
+
+![Deployment Diagram](output/app.png)
+
 ## Local Development
 
 ### Install Dinghy Cli
