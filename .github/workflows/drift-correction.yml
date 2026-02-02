@@ -21,7 +21,7 @@ jobs:
           role-to-assume: ${{ secrets.AWS_DEPLOY_ROLE }}
       - uses: dinghydev/setup-dinghy@main
         with:
-          prepare-images: release,tf
+          prepare-images: tf
       - name: Download Dinghy Output
         uses: actions/download-artifact@v6
         with:
