@@ -1,10 +1,7 @@
 awsStack:
   title: dinghy.dev Demo Sites
   s3Backend: true
-  regionalLogBucket: true
-  globalLogBucket: true
-s3Bucket:
-  loggingEnabled: true
+  logBucket: true
 awsProvider:
   region: eu-west-1
 sites:
