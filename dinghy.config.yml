@@ -6,6 +6,7 @@ awsProvider:
   region: eu-west-1
 sites:
   cloudfront-site-demo.dinghy.dev:
+    defaultRootObject: index.html
     origins:
       site_root:
         target: 's3://dinghy-dev-demo-sites-origin'
